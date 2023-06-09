@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Environment {
+  HOUSE
+  APARTMENT
+  LARGE_ENVIRONMENT
+}
+
+enum Energy {
+  MEDIA
+  HIGH
+  LOW
+}
+
+enum TypePet {
+  CAT
+  DOG
+}
+
+model Pet {
+  id              String       @id @default(uuid())
+  organization_id String
+  organization    Organization @relation(fields: [organization_id], references: [id])
+  name            String       @db.VarChar(100)
+  type_pet        TypePet
+  energy          Energy
+  environment     Environment
+  description     String       @db.VarChar(80)
+  size            String       @db.VarChar(80)
+  dependencyLevel String       @db.VarChar(100)
+  birthday        String       @db.Char(20)
+  adoption        Boolean      @default(true)
+  Pet_Images      Pet_Images[]
+
+  @@map("pets")
+}
+
+model Pet_Images {
+  id     String @id @default(uuid())
+  pet_id String
+  pet    Pet    @relation(fields: [pet_id], references: [id])
+  img    String
+
+  @@map("pet_images")
+}
+
+model Organization {
+  id            String      @id @default(uuid())
+  name          String      @db.VarChar(100)
+  email         String      @db.VarChar(120)
+  cep           String      @db.VarChar(20)
+  password_hash String
+  Telephone     Telephone[]
+  Eddress       Address[]
+  Pet           Pet[]
+
+  @@map("organizations")
+}
+
+model Telephone {
+  id              String       @id @default(uuid())
+  organization_id String
+  organization    Organization @relation(fields: [organization_id], references: [id])
+  DDD             String       @db.Char(2)
+  phone           String       @db.Char(9)
+
+  @@map("telephones")
+}
+
+model Address {
+  id              String       @id @default(uuid())
+  organization_id String
+  organization    Organization @relation(fields: [organization_id], references: [id])
+  block           String       @db.VarChar(100)
+  number          String?      @db.VarChar(20)
+  complement      String?      @db.VarChar(20)
+  street          String       @db.VarChar(80)
+  latitude        Decimal
+  longitude       Decimal
+
+  @@map("anddresses")
+}
